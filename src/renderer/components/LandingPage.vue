@@ -1,43 +1,43 @@
 <template>
   <div id="wrapper">
-    <img id="logo" src="~@/assets/logo.png" alt="electron-vue">
-    <main>
-      <div class="left-side">
-        <span class="title">
-          该项目的目的，是为了要避免使用 vue 手动建立起 electron 应用程序。electron-vue 充分利用 vue-cli 作为脚手架工具，加上拥有 vue-loader 的 webpack、electron-packager 或是 electron-builder，以及一些最常用的插件，如vue-router、vuex 等等。
-        </span>
-        <system-information></system-information>
-      </div>
+    <el-row>
+      <el-button type="primary" @click="add()">主要按钮</el-button>
 
-      <div class="right-side">
-        <div class="doc">
-          <div class="title">Getting Started</div>
-          <p>
-            electron-vue comes packed with detailed documentation that covers everything from
-            internal configurations, using the project structure, building your application,
-            and so much more.
-          </p>
-          <button @click="open('https://simulatedgreg.gitbooks.io/electron-vue/content/')">Read the Docs</button><br><br>
-        </div>
-        <div class="doc">
-          <div class="title alt">Other Documentation</div>
-          <button class="alt" @click="open('https://electron.atom.io/docs/')">Electron</button>
-          <button class="alt" @click="open('https://vuejs.org/v2/guide/')">Vue.js</button>
-        </div>
-      </div>
-    </main>
+    </el-row>
   </div>
 </template>
 
 <script>
   import SystemInformation from './LandingPage/SystemInformation'
+  import {ipcRenderer } from 'electron'
 
   export default {
     name: 'landing-page',
     components: { SystemInformation },
+      data() {
+          return {
+              activeIndex: '1',
+              activeIndex2: '1'
+          };
+      },
     methods: {
-      open (link) {
-        this.$electron.shell.openExternal(link)
+        handleSelect(key, keyPath) {
+            console.log(key, keyPath);
+        },
+
+      add(){
+            //异步方法
+//          ipcRenderer.send('asynchronous-message', '我接到了');
+//          ipcRenderer.on('asynchronous-reply', function (event, arg) {
+//              console.log( `我获取到的mac地址: ${arg}`)
+//          })
+          const reply = ipcRenderer.sendSync('synchronous-message', '我接到了')
+          this.$message({
+              showClose: true,
+              message: `我获取到你的mac地址: ${reply}`,
+              type: 'success'
+          });
+
       }
     }
   }
@@ -61,9 +61,6 @@
         rgba(255, 255, 255, 1) 40%,
         rgba(229, 229, 229, .9) 100%
       );
-    height: 100vh;
-    padding: 60px 80px;
-    width: 100vw;
   }
 
   #logo {

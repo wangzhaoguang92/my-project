@@ -1,5 +1,5 @@
-import { app, BrowserWindow } from 'electron'
-
+import { app, BrowserWindow,ipcMain} from 'electron'
+const MacAdd=require('getmac');
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -20,8 +20,9 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
-  })
+    width: 1000,
+    backgroundColor:"#f60"
+  });
 
   mainWindow.loadURL(winURL)
 
@@ -29,6 +30,18 @@ function createWindow () {
     mainWindow = null
   })
 }
+
+//主进程向渲染进程发送异步消息把获取的mac地址传送给渲染进程
+ipcMain.on('synchronous-message', function (event, arg) {
+    MacAdd.getMac(function(err,macAddress){
+        if (err)  throw err;
+        let mac = macAddress; //获取mac地址
+        event.returnValue = mac;
+        // event.sender.send('asynchronous-reply', mac)
+    });
+
+});
+//获取机器mac地址
 
 app.on('ready', createWindow)
 
